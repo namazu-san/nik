@@ -2,9 +2,12 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nicola e le mentos</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body, html {
             margin: 0;
             padding: 0;
@@ -18,6 +21,8 @@
             width: 100%;
             height: 100%;
             background-color: #26343a;
+            max-width: 100%;
+            max-height: 100%;
         }
         #playerPlatform {
             position: absolute;
@@ -89,6 +94,26 @@
         #controlRight {
             right: 20px;
         }
+        
+        /* Media query per dispositivi mobili */
+        @media screen and (max-width: 600px) {
+            #playerPlatform {
+                width: 20px;
+                height: 15px;
+            }
+            #topLauncher {
+                width: 150px;
+                height: 75px;
+            }
+            #controlLeft, #controlRight {
+                width: 40px;
+                height: 40px;
+                bottom: 10px;
+            }
+            #scoreDisplay {
+                font-size: 18px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -119,7 +144,7 @@
                 this.controlRight = document.getElementById('controlRight');
 
                 this.score = 0;
-                this.difficulty = 1;
+                this.difficulty = 10;
                 this.isGameOver = false;
                 this.candyGeneratorInterval = null;
                 this.topLauncherMovementInterval = null;
@@ -128,6 +153,10 @@
             }
 
             initializeGame() {
+                // Adatta gli elementi alle dimensioni dello schermo
+                this.adjustGameElements();
+                window.addEventListener('resize', () => this.adjustGameElements());
+
                 // Set custom images (you can replace these paths)
                 this.playerPlatform.style.backgroundImage = 'url("immagine1.png")';
                 this.topLauncher.style.backgroundImage = 'url("immagine2.png")';
@@ -135,6 +164,24 @@
                 this.setupPlayerPlatformControls();
                 this.setupRestartButton();
                 this.startGame();
+            }
+
+            adjustGameElements() {
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+
+                // Regola le dimensioni dei componenti in base alla larghezza dello schermo
+                const platformWidth = Math.min(screenWidth * 0.2, 200);
+                const platformHeight = Math.min(screenHeight * 0.12, 100);
+
+                this.playerPlatform.style.width = `${platformWidth}px`;
+                this.playerPlatform.style.height = `${platformHeight}px`;
+                this.topLauncher.style.width = `${platformWidth}px`;
+                
+                // Assicura che la piattaforma rimanga all'interno dei bordi dello schermo
+                const currentLeft = parseInt(this.playerPlatform.style.left || 0);
+                const newLeft = Math.max(0, Math.min(currentLeft, screenWidth - platformWidth));
+                this.playerPlatform.style.left = `${newLeft}px`;
             }
 
             setupPlayerPlatformControls() {
@@ -152,7 +199,7 @@
                         platformX += 35;
                     }
 
-                    platformX = Math.max(0, Math.min(platformX, window.innerWidth - 200));
+                    platformX = Math.max(0, Math.min(platformX, window.innerWidth - 100));
                     this.playerPlatform.style.left = `${platformX}px`;
                 };
 
@@ -231,7 +278,7 @@
             }
 
             startTopLauncherMovement() {
-                let direction = 1;
+                let direction = 3;
                 let topLauncherX = 0;
 
                 this.topLauncherMovementInterval = setInterval(() => {
@@ -249,7 +296,7 @@
                     }
                     if (topLauncherX < 0) {
                         topLauncherX = 0;
-                        direction = 1;
+                        direction = 5;
                     }
 
                     this.topLauncher.style.left = `${topLauncherX}px`;
@@ -311,7 +358,7 @@
                 this.scoreDisplay.textContent = `Score: ${this.score}`;
 
                 // Increase difficulty
-                if (this.score % 50 === 0) {
+                if (this.score % 150 === 0) {
                     this.difficulty++;
                 }
             }
@@ -332,9 +379,9 @@
 
                 // Reset game state
                 this.score = 0;
-                this.difficulty = 1;
+                this.difficulty = 7;
                 this.isGameOver = false;
-                this.scoreDisplay.textContent = 'Score: 0';
+                this.scoreDisplay.textContent = 'Punti: 0';
                 this.gameOverlay.style.display = 'none';
 
                 // Restart game
