@@ -20,7 +20,7 @@
             position: relative;
             width: 100%;
             height: 100%;
-            background-color: #26343a;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             max-width: 100%;
             max-height: 100%;
         }
@@ -32,7 +32,11 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            transition: left 0.2s ease;
+            transition: none;
+            cursor: grab;
+        }
+        #playerPlatform:active {
+            cursor: grabbing;
         }
         #topLauncher {
             position: absolute;
@@ -45,10 +49,17 @@
         }
         .candy {
             position: absolute;
-            width: 30px;
-            height: 30px;
-            background-color: #FFD700;
+            width: 25px;
+            height: 25px;
+            background: radial-gradient(circle, #FFD700, #FFA500);
             border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            animation: candySpin 2s linear infinite;
+        }
+        @keyframes candySpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
         #scoreDisplay {
             position: absolute;
@@ -56,7 +67,23 @@
             left: 10px;
             color: white;
             font-size: 24px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.3);
+            padding: 10px 15px;
+            border-radius: 20px;
+        }
+        #difficultyDisplay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            background: rgba(255,0,0,0.3);
+            padding: 8px 12px;
+            border-radius: 15px;
         }
         #gameOverlay {
             position: absolute;
@@ -64,54 +91,140 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.7);
+            background: linear-gradient(45deg, rgba(0,0,0,0.9), rgba(50,50,50,0.9));
             display: none;
             justify-content: center;
             align-items: center;
             flex-direction: column;
             color: white;
             z-index: 100;
+            text-align: center;
+            overflow-y: auto;
+            padding: 20px;
         }
-        #controlLeft, #controlRight {
-            position: absolute;
-            bottom: 20px;
-            width: 50px;
-            height: 50px;
-            background-color: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            z-index: 10;
+        #gameOverlay h1 {
+            font-size: 48px;
+            margin: 20px 0;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+        }
+        #gameOverlay p {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+        #playerNameInput {
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            border: 2px solid #ff6b35;
+            padding: 12px 20px;
+            font-size: 18px;
+            border-radius: 25px;
+            margin: 15px 0;
+            text-align: center;
+            width: 250px;
+            max-width: 90%;
+        }
+        #playerNameInput:focus {
+            outline: none;
+            border-color: #ff8e53;
+            box-shadow: 0 0 10px rgba(255,107,53,0.5);
+        }
+        #saveScoreButton, #restartButton {
+            background: linear-gradient(45deg, #ff6b35, #ff8e53);
             color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
             font-weight: bold;
-            user-select: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease;
         }
-        #controlLeft {
-            left: 20px;
+        #saveScoreButton:hover, #restartButton:hover {
+            transform: scale(1.05);
         }
-        #controlRight {
-            right: 20px;
+        #saveScoreButton:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #leaderboard {
+            background: rgba(0,0,0,0.7);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            max-width: 400px;
+        }
+        #leaderboard h3 {
+            color: #FFD700;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            margin: 5px 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        .leaderboard-entry.current-score {
+            background: linear-gradient(45deg, rgba(255,107,53,0.3), rgba(255,142,83,0.3));
+            border: 2px solid #ff6b35;
+        }
+        .rank {
+            font-weight: bold;
+            color: #FFD700;
+            margin-right: 10px;
+        }
+        .player-name {
+            flex-grow: 1;
+            text-align: left;
+        }
+        .score {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        #instructions {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 14px;
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 15px;
+            border-radius: 10px;
+            opacity: 0.8;
         }
         
         /* Media query per dispositivi mobili */
         @media screen and (max-width: 600px) {
             #playerPlatform {
-                width: 20px;
-                height: 15px;
+                width: 80px;
+                height: 80px;
             }
             #topLauncher {
                 width: 150px;
                 height: 75px;
             }
-            #controlLeft, #controlRight {
-                width: 40px;
-                height: 40px;
-                bottom: 10px;
-            }
             #scoreDisplay {
                 font-size: 18px;
+                padding: 8px 12px;
+            }
+            #difficultyDisplay {
+                font-size: 16px;
+                padding: 6px 10px;
+            }
+            #gameOverlay h1 {
+                font-size: 36px;
+            }
+            #instructions {
+                font-size: 12px;
             }
         }
     </style>
@@ -119,50 +232,93 @@
 <body>
     <div id="gameContainer">
         <div id="scoreDisplay">Punti: 0</div>
+        <div id="difficultyDisplay">Livello: 1</div>
         <div id="topLauncher"></div>
         <div id="playerPlatform"></div>
-        <div id="controlLeft">←</div>
-        <div id="controlRight">→</div>
+        <div id="instructions"></div>
         <div id="gameOverlay">
-            <h1>Minkione</h1>
+            <h1>Minkione!</h1>
             <p id="finalScore">Punti: 0</p>
-            <button id="restartButton">Hai perso Vaso</button>
+            <p id="finalLevel">Livello Raggiunto: 1</p>
+            
+            <div id="nameInputSection">
+                <p>Inserisci il tuo nome per la classifica:</p>
+                <input type="text" id="playerNameInput" placeholder="Il tuo nome..." maxlength="20">
+                <br>
+                <button id="saveScoreButton">Salva Punteggio</button>
+            </div>
+            
+            <div id="leaderboard">
+                <h3>🏆 Classifica Top 5</h3>
+                <div id="leaderboardList"></div>
+            </div>
+            
+            <button id="restartButton">Hai perso Vaso - Riprova!</button>
         </div>
     </div>
 
     <script>
-        class CandyCatchGame {
+        class ImprovedCandyCatchGame {
             constructor() {
                 this.container = document.getElementById('gameContainer');
                 this.playerPlatform = document.getElementById('playerPlatform');
                 this.topLauncher = document.getElementById('topLauncher');
                 this.scoreDisplay = document.getElementById('scoreDisplay');
+                this.difficultyDisplay = document.getElementById('difficultyDisplay');
                 this.gameOverlay = document.getElementById('gameOverlay');
                 this.restartButton = document.getElementById('restartButton');
                 this.finalScoreDisplay = document.getElementById('finalScore');
-                this.controlLeft = document.getElementById('controlLeft');
-                this.controlRight = document.getElementById('controlRight');
+                this.finalLevelDisplay = document.getElementById('finalLevel');
+                this.playerNameInput = document.getElementById('playerNameInput');
+                this.saveScoreButton = document.getElementById('saveScoreButton');
+                this.leaderboardList = document.getElementById('leaderboardList');
+                this.nameInputSection = document.getElementById('nameInputSection');
 
                 this.score = 0;
-                this.difficulty = 10;
+                this.level = 1;
                 this.isGameOver = false;
                 this.candyGeneratorInterval = null;
                 this.topLauncherMovementInterval = null;
+                this.scoreSaved = false;
+                
+                // Variabili per il movimento della piattaforma
+                this.isDragging = false;
+                this.dragStartX = 0;
+                this.platformStartX = 0;
+                
+                // Variabili per difficoltà dinamica (AUMENTATA)
+                this.launcherSpeed = 4; // Aumentato da 2
+                this.launcherDirection = 1;
+                this.directionChangeChance = 0.05; // Aumentato da 0.02
+                this.candyFallSpeed = 5; // Aumentato da 3
+                this.candySpawnRate = 1500; // Diminuito da 2000
+                this.maxCandiesOnScreen = 4; // Aumentato da 3
+                this.currentCandies = 0;
+
+                // Sistema classifica
+                this.leaderboard = this.loadLeaderboard();
 
                 this.initializeGame();
             }
 
             initializeGame() {
-                // Adatta gli elementi alle dimensioni dello schermo
                 this.adjustGameElements();
                 window.addEventListener('resize', () => this.adjustGameElements());
-
-                // Set custom images (you can replace these paths)
+                
+                // Ripristina le immagini personalizzate
                 this.playerPlatform.style.backgroundImage = 'url("immagine1.png")';
                 this.topLauncher.style.backgroundImage = 'url("immagine2.png")';
-
-                this.setupPlayerPlatformControls();
+                this.playerPlatform.style.backgroundSize = 'contain';
+                this.playerPlatform.style.backgroundRepeat = 'no-repeat';
+                this.playerPlatform.style.backgroundPosition = 'center';
+                this.topLauncher.style.backgroundSize = 'contain';
+                this.topLauncher.style.backgroundRepeat = 'no-repeat';
+                this.topLauncher.style.backgroundPosition = 'center';
+                
+                this.setupDragControls();
                 this.setupRestartButton();
+                this.setupLeaderboardControls();
+                this.centerPlatform();
                 this.startGame();
             }
 
@@ -170,105 +326,182 @@
                 const screenWidth = window.innerWidth;
                 const screenHeight = window.innerHeight;
 
-                // Regola le dimensioni dei componenti in base alla larghezza dello schermo
-                const platformWidth = Math.min(screenWidth * 0.2, 200);
-                const platformHeight = Math.min(screenHeight * 0.12, 100);
-
-                this.playerPlatform.style.width = `${platformWidth}px`;
-                this.playerPlatform.style.height = `${platformHeight}px`;
-                this.topLauncher.style.width = `${platformWidth}px`;
-                
-                // Assicura che la piattaforma rimanga all'interno dei bordi dello schermo
-                const currentLeft = parseInt(this.playerPlatform.style.left || 0);
-                const newLeft = Math.max(0, Math.min(currentLeft, screenWidth - platformWidth));
-                this.playerPlatform.style.left = `${newLeft}px`;
+                // Regola le dimensioni dei componenti mantenendo le proporzioni originali
+                if (screenWidth <= 600) {
+                    this.playerPlatform.style.width = '80px';
+                    this.playerPlatform.style.height = '80px';
+                    this.topLauncher.style.width = '150px';
+                    this.topLauncher.style.height = '75px';
+                } else {
+                    this.playerPlatform.style.width = '100px';
+                    this.playerPlatform.style.height = '100px';
+                    this.topLauncher.style.width = '300px';
+                    this.topLauncher.style.height = '80px';
+                }
             }
 
-            setupPlayerPlatformControls() {
-                let isMovingLeft = false;
-                let isMovingRight = false;
-                let platformX = window.innerWidth / 2 - 100;
+            centerPlatform() {
+                const platformWidth = parseInt(this.playerPlatform.style.width);
+                const centerX = (window.innerWidth - platformWidth) / 2;
+                this.playerPlatform.style.left = `${centerX}px`;
+            }
 
-                const movePlatform = () => {
-                    if (this.isGameOver) return;
+            setupDragControls() {
+                // Mouse events
+                this.playerPlatform.addEventListener('mousedown', this.startDrag.bind(this));
+                document.addEventListener('mousemove', this.drag.bind(this));
+                document.addEventListener('mouseup', this.endDrag.bind(this));
 
-                    if (isMovingLeft) {
-                        platformX -= 35;
-                    }
-                    if (isMovingRight) {
-                        platformX += 35;
-                    }
+                // Touch events
+                this.playerPlatform.addEventListener('touchstart', this.startDragTouch.bind(this));
+                document.addEventListener('touchmove', this.dragTouch.bind(this));
+                document.addEventListener('touchend', this.endDrag.bind(this));
 
-                    platformX = Math.max(0, Math.min(platformX, window.innerWidth - 100));
-                    this.playerPlatform.style.left = `${platformX}px`;
-                };
+                // Previeni il trascinamento predefinito delle immagini
+                this.playerPlatform.addEventListener('dragstart', e => e.preventDefault());
+            }
 
-                // Smooth movement
-                const moveInterval = setInterval(movePlatform, 16); // ~60 FPS
+            startDrag(e) {
+                if (this.isGameOver) return;
+                this.isDragging = true;
+                this.dragStartX = e.clientX;
+                this.platformStartX = parseInt(this.playerPlatform.style.left) || 0;
+                e.preventDefault();
+            }
 
-                // Keyboard Controls
-                document.addEventListener('keydown', (e) => {
-                    if (this.isGameOver) return;
-                    if (e.key === 'ArrowLeft') isMovingLeft = true;
-                    if (e.key === 'ArrowRight') isMovingRight = true;
-                });
+            startDragTouch(e) {
+                if (this.isGameOver) return;
+                this.isDragging = true;
+                this.dragStartX = e.touches[0].clientX;
+                this.platformStartX = parseInt(this.playerPlatform.style.left) || 0;
+                e.preventDefault();
+            }
 
-                document.addEventListener('keyup', (e) => {
-                    if (e.key === 'ArrowLeft') isMovingLeft = false;
-                    if (e.key === 'ArrowRight') isMovingRight = false;
-                });
+            drag(e) {
+                if (!this.isDragging || this.isGameOver) return;
+                
+                const currentX = e.clientX;
+                const deltaX = currentX - this.dragStartX;
+                const newX = this.platformStartX + deltaX;
+                
+                this.constrainPlatform(newX);
+            }
 
-                // Touch Controls for Left Button
-                this.controlLeft.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    isMovingLeft = true;
-                });
-                this.controlLeft.addEventListener('touchend', () => {
-                    isMovingLeft = false;
-                });
-                this.controlLeft.addEventListener('touchcancel', () => {
-                    isMovingLeft = false;
-                });
+            dragTouch(e) {
+                if (!this.isDragging || this.isGameOver) return;
+                
+                const currentX = e.touches[0].clientX;
+                const deltaX = currentX - this.dragStartX;
+                const newX = this.platformStartX + deltaX;
+                
+                this.constrainPlatform(newX);
+                e.preventDefault();
+            }
 
-                // Touch Controls for Right Button
-                this.controlRight.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    isMovingRight = true;
-                });
-                this.controlRight.addEventListener('touchend', () => {
-                    isMovingRight = false;
-                });
-                this.controlRight.addEventListener('touchcancel', () => {
-                    isMovingRight = false;
-                });
+            constrainPlatform(newX) {
+                const platformWidth = parseInt(this.playerPlatform.style.width);
+                const maxX = window.innerWidth - platformWidth;
+                const constrainedX = Math.max(0, Math.min(newX, maxX));
+                this.playerPlatform.style.left = `${constrainedX}px`;
+            }
 
-                // Mouse Controls for Touch Buttons (for desktop testing)
-                this.controlLeft.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    isMovingLeft = true;
-                });
-                this.controlLeft.addEventListener('mouseup', () => {
-                    isMovingLeft = false;
-                });
-                this.controlLeft.addEventListener('mouseleave', () => {
-                    isMovingLeft = false;
-                });
-
-                this.controlRight.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    isMovingRight = true;
-                });
-                this.controlRight.addEventListener('mouseup', () => {
-                    isMovingRight = false;
-                });
-                this.controlRight.addEventListener('mouseleave', () => {
-                    isMovingRight = false;
-                });
+            endDrag() {
+                this.isDragging = false;
             }
 
             setupRestartButton() {
                 this.restartButton.addEventListener('click', () => {
                     this.resetGame();
+                });
+            }
+
+            setupLeaderboardControls() {
+                this.saveScoreButton.addEventListener('click', () => {
+                    this.savePlayerScore();
+                });
+
+                this.playerNameInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.savePlayerScore();
+                    }
+                });
+            }
+
+            loadLeaderboard() {
+                // Simula il caricamento da file JSON
+                const savedLeaderboard = localStorage.getItem('candyGameLeaderboard');
+                if (savedLeaderboard) {
+                    return JSON.parse(savedLeaderboard);
+                }
+                return [];
+            }
+
+            saveLeaderboard() {
+                // Simula il salvataggio su file JSON
+                localStorage.setItem('candyGameLeaderboard', JSON.stringify(this.leaderboard));
+            }
+
+            savePlayerScore() {
+                const playerName = this.playerNameInput.value.trim();
+                if (!playerName) {
+                    alert('Inserisci il tuo nome!');
+                    return;
+                }
+
+                if (this.scoreSaved) {
+                    return;
+                }
+
+                // Aggiungi il nuovo punteggio
+                this.leaderboard.push({
+                    name: playerName,
+                    score: this.score,
+                    level: this.level,
+                    date: new Date().toLocaleDateString('it-IT')
+                });
+
+                // Ordina per punteggio decrescente
+                this.leaderboard.sort((a, b) => b.score - a.score);
+
+                // Mantieni solo i top 5
+                this.leaderboard = this.leaderboard.slice(0, 5);
+
+                // Salva nel "file JSON"
+                this.saveLeaderboard();
+
+                this.scoreSaved = true;
+                this.saveScoreButton.disabled = true;
+                this.saveScoreButton.textContent = 'Punteggio Salvato!';
+                this.nameInputSection.style.opacity = '0.5';
+
+                // Aggiorna la visualizzazione della classifica
+                this.displayLeaderboard();
+            }
+
+            displayLeaderboard() {
+                this.leaderboardList.innerHTML = '';
+
+                if (this.leaderboard.length === 0) {
+                    this.leaderboardList.innerHTML = '<p style="opacity: 0.7;">Nessun punteggio salvato</p>';
+                    return;
+                }
+
+                this.leaderboard.forEach((entry, index) => {
+                    const entryDiv = document.createElement('div');
+                    entryDiv.className = 'leaderboard-entry';
+                    
+                    // Evidenzia il punteggio appena salvato
+                    if (this.scoreSaved && entry.score === this.score && entry.name === this.playerNameInput.value.trim()) {
+                        entryDiv.classList.add('current-score');
+                    }
+
+                    entryDiv.innerHTML = `
+                        <span class="rank">${index + 1}°</span>
+                        <span class="player-name">${entry.name}</span>
+                        <span class="score">${entry.score}</span>
+                    `;
+
+                    this.leaderboardList.appendChild(entryDiv);
                 });
             }
 
@@ -278,88 +511,130 @@
             }
 
             startTopLauncherMovement() {
-                let direction = 3;
-                let topLauncherX = 0;
+                let topLauncherX = Math.random() * (window.innerWidth - 300);
+                this.topLauncher.style.left = `${topLauncherX}px`;
 
                 this.topLauncherMovementInterval = setInterval(() => {
-                    topLauncherX += 3 * direction;
-
-                    // Change direction randomly
-                    if (Math.random() < 0.05) {
-                        direction *= -1;
+                    // Aumenta la probabilità di cambiare direzione con il livello
+                    this.directionChangeChance = 0.05 + (this.level * 0.01); // Più imprevedibile
+                    
+                    // Cambia direzione casualmente o quando colpisce i bordi
+                    if (Math.random() < this.directionChangeChance) {
+                        this.launcherDirection *= -1;
+                        // Aggiunge variazione casuale alla velocità (più alta)
+                        this.launcherSpeed = 4 + Math.random() * (this.level * 0.8);
                     }
 
-                    // Constrain movement
-                    if (topLauncherX > window.innerWidth - 200) {
-                        topLauncherX = window.innerWidth - 200;
-                        direction = -1;
+                    topLauncherX += this.launcherSpeed * this.launcherDirection;
+
+                    // Rimbalza sui bordi (usando la larghezza corretta del launcher)
+                    const launcherWidth = parseInt(this.topLauncher.style.width) || 300;
+                    if (topLauncherX > window.innerWidth - launcherWidth) {
+                        topLauncherX = window.innerWidth - launcherWidth;
+                        this.launcherDirection = -1;
+                        this.launcherSpeed = 4 + Math.random() * (this.level * 0.5);
                     }
                     if (topLauncherX < 0) {
                         topLauncherX = 0;
-                        direction = 5;
+                        this.launcherDirection = 1;
+                        this.launcherSpeed = 4 + Math.random() * (this.level * 0.5);
                     }
 
                     this.topLauncher.style.left = `${topLauncherX}px`;
-                }, 20);
+                }, 25 - Math.min(this.level * 2, 15)); // Movimento ancora più veloce
             }
 
             startCandyGenerator() {
                 this.candyGeneratorInterval = setInterval(() => {
                     if (this.isGameOver) return;
-
-                    this.createCandy();
-                }, Math.max(1500 - (this.difficulty * 100), 300));
+                    
+                    // Limita il numero di caramelle sullo schermo
+                    if (this.currentCandies < this.maxCandiesOnScreen + Math.floor(this.level / 2)) {
+                        this.createCandy();
+                    }
+                }, Math.max(800 - (this.level * 60), 300)); // Spawn più frequente e aggressivo
             }
 
             createCandy() {
                 const candy = document.createElement('div');
                 candy.classList.add('candy');
+                this.currentCandies++;
 
-                // Start from top launcher's position
+                // Genera caramelle dalla posizione del lanciatore con dispersione
                 const launcherRect = this.topLauncher.getBoundingClientRect();
-                const startX = launcherRect.left + Math.random() * launcherRect.width;
+                const spreadRange = 100 + (this.level * 10); // Dispersione aumenta con il livello
+                const startX = launcherRect.left + (launcherRect.width / 2) - 12.5 + 
+                              (Math.random() - 0.5) * spreadRange;
                 
-                candy.style.left = `${startX}px`;
-                candy.style.top = '80px';
+                candy.style.left = `${Math.max(0, Math.min(startX, window.innerWidth - 25))}px`;
+                candy.style.top = '60px';
                 
                 this.container.appendChild(candy);
 
-                let candyY = 80;
+                let candyY = 60;
+                const fallSpeed = this.candyFallSpeed + (this.level * 0.8); // Velocità più alta
+                
                 const fallInterval = setInterval(() => {
-                    candyY += 5 + this.difficulty;
+                    candyY += fallSpeed;
                     candy.style.top = `${candyY}px`;
 
                     const platformRect = this.playerPlatform.getBoundingClientRect();
                     const candyRect = candy.getBoundingClientRect();
 
+                    // Controllo collisione più preciso
                     if (
                         candyRect.bottom >= platformRect.top &&
+                        candyRect.top <= platformRect.bottom &&
                         candyRect.left < platformRect.right &&
                         candyRect.right > platformRect.left
                     ) {
                         clearInterval(fallInterval);
                         this.container.removeChild(candy);
-                        this.updateScore(10);
+                        this.currentCandies--;
+                        this.updateScore(10 + (this.level * 2)); // Punti extra per livelli alti
+                        
+                        // Effetto visivo quando si prende una caramella
+                        this.playerPlatform.style.transform = 'scale(1.1)';
+                        setTimeout(() => {
+                            this.playerPlatform.style.transform = 'scale(1)';
+                        }, 100);
                     }
 
                     if (candyY > window.innerHeight) {
                         clearInterval(fallInterval);
-                        this.container.removeChild(candy);
+                        if (this.container.contains(candy)) {
+                            this.container.removeChild(candy);
+                        }
+                        this.currentCandies--;
                         
                         if (!this.isGameOver) {
                             this.gameOver();
                         }
                     }
-                }, 50);
+                }, 16); // ~60 FPS per movimento fluido
             }
 
             updateScore(points) {
                 this.score += points;
-                this.scoreDisplay.textContent = `Score: ${this.score}`;
+                this.scoreDisplay.textContent = `Punti: ${this.score}`;
 
-                // Increase difficulty
-                if (this.score % 150 === 0) {
-                    this.difficulty++;
+                // Calcola il livello basato sul punteggio
+                const oldLevel = this.level;
+                this.level = Math.floor(this.score / 100) + 1;
+                
+                if (this.level > oldLevel) {
+                    this.difficultyDisplay.textContent = `Livello: ${this.level}`;
+                    
+                    // Effetto visivo per il cambio livello
+                    this.difficultyDisplay.style.transform = 'scale(1.3)';
+                    this.difficultyDisplay.style.color = '#ffff00';
+                    setTimeout(() => {
+                        this.difficultyDisplay.style.transform = 'scale(1)';
+                        this.difficultyDisplay.style.color = 'white';
+                    }, 500);
+                    
+                    // Aumenta il numero massimo di caramelle
+                    this.maxCandiesOnScreen = Math.min(3 + Math.floor(this.level / 2), 8);
                 }
             }
 
@@ -368,30 +643,65 @@
                 clearInterval(this.candyGeneratorInterval);
                 clearInterval(this.topLauncherMovementInterval);
 
-                this.finalScoreDisplay.textContent = `Score: ${this.score}`;
+                this.finalScoreDisplay.textContent = `Punti: ${this.score}`;
+                this.finalLevelDisplay.textContent = `Livello Raggiunto: ${this.level}`;
+                
+                // Reset dei controlli della classifica
+                this.scoreSaved = false;
+                this.saveScoreButton.disabled = false;
+                this.saveScoreButton.textContent = 'Salva Punteggio';
+                this.playerNameInput.value = '';
+                this.nameInputSection.style.opacity = '1';
+                
+                // Mostra la classifica attuale
+                this.displayLeaderboard();
+                
                 this.gameOverlay.style.display = 'flex';
+                
+                // Effetto di dissolvenza
+                this.gameOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    this.gameOverlay.style.opacity = '1';
+                }, 100);
+
+                // Focus automatico sul campo nome
+                setTimeout(() => {
+                    this.playerNameInput.focus();
+                }, 500);
             }
 
             resetGame() {
-                // Clear existing candies
+                // Pulisci le caramelle esistenti
                 const candies = document.querySelectorAll('.candy');
                 candies.forEach(candy => candy.remove());
 
-                // Reset game state
+                // Reset stato del gioco
                 this.score = 0;
-                this.difficulty = 7;
+                this.level = 1;
+                this.currentCandies = 0;
                 this.isGameOver = false;
+                this.scoreSaved = false;
+                this.launcherSpeed = 4; // Reset alla difficoltà iniziale aumentata
+                this.launcherDirection = 1;
+                this.directionChangeChance = 0.05;
+                this.maxCandiesOnScreen = 4;
+                
                 this.scoreDisplay.textContent = 'Punti: 0';
+                this.difficultyDisplay.textContent = 'Livello: 1';
                 this.gameOverlay.style.display = 'none';
+                
+                // Reset posizione piattaforma
+                this.centerPlatform();
+                this.playerPlatform.style.transform = 'scale(1)';
 
-                // Restart game
+                // Riavvia il gioco
                 this.startGame();
             }
         }
 
-        // Initialize game when page loads
+        // Inizializza il gioco quando la pagina è caricata
         window.addEventListener('load', () => {
-            new CandyCatchGame();
+            new ImprovedCandyCatchGame();
         });
     </script>
 </body>
