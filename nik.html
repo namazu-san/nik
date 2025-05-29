@@ -296,9 +296,66 @@
                 this.currentCandies = 0;
 
                 // Sistema classifica
-                this.leaderboard = this.loadLeaderboard();
+                this.leaderboard = [];
+                this.loadLeaderboard();
 
                 this.initializeGame();
+            }
+
+            async loadLeaderboard() {
+                try {
+                    const response = await fetch('https://www.archiviovppay.it/test/save_leaderboard.php', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.leaderboard = data.leaderboard || [];
+                    } else {
+                        console.log('Errore nel caricamento della classifica:', response.status);
+                        this.leaderboard = [];
+                    }
+                } catch (error) {
+                    console.log('Errore nel caricamento della classifica:', error);
+                    this.leaderboard = [];
+                }
+                this.displayLeaderboard();
+            }
+
+            async saveLeaderboard(playerName, score, level) {
+                try {
+                    const response = await fetch('https://www.archiviovppay.it/test/save_leaderboard.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            name: playerName,
+                            score: score,
+                            level: level
+                        })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (response.ok && result.success) {
+                        // Aggiorna la classifica locale con quella restituita dal server
+                        this.leaderboard = result.leaderboard;
+                        console.log('Punteggio salvato con successo!');
+                        return true;
+                    } else {
+                        console.error('Errore nel salvataggio:', result.error || 'Errore sconosciuto');
+                        alert('Errore nel salvataggio: ' + (result.error || 'Errore sconosciuto'));
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Errore di rete nel salvataggio:', error);
+                    alert('Errore di connessione. Riprova più tardi.');
+                    return false;
+                }
             }
 
             initializeGame() {
@@ -427,21 +484,7 @@
                 });
             }
 
-            loadLeaderboard() {
-                // Simula il caricamento da file JSON
-                const savedLeaderboard = localStorage.getItem('candyGameLeaderboard');
-                if (savedLeaderboard) {
-                    return JSON.parse(savedLeaderboard);
-                }
-                return [];
-            }
-
-            saveLeaderboard() {
-                // Simula il salvataggio su file JSON
-                localStorage.setItem('candyGameLeaderboard', JSON.stringify(this.leaderboard));
-            }
-
-            savePlayerScore() {
+            async savePlayerScore() {
                 const playerName = this.playerNameInput.value.trim();
                 if (!playerName) {
                     alert('Inserisci il tuo nome!');
@@ -452,32 +495,26 @@
                     return;
                 }
 
-                // Aggiungi il nuovo punteggio
-                this.leaderboard.push({
-                    name: playerName,
-                    score: this.score,
-                    level: this.level,
-                    date: new Date().toLocaleDateString('it-IT')
-                });
-
-                // Ordina per punteggio decrescente
-                this.leaderboard.sort((a, b) => b.score - a.score);
-
-                // Mantieni solo i top 5
-                this.leaderboard = this.leaderboard.slice(0, 5);
-
-                // Salva nel "file JSON"
-                this.saveLeaderboard();
-
-                this.scoreSaved = true;
+                // Disabilita il bottone durante il salvataggio
                 this.saveScoreButton.disabled = true;
-                this.saveScoreButton.textContent = 'Punteggio Salvato!';
-                this.nameInputSection.style.opacity = '0.5';
+                this.saveScoreButton.textContent = 'Salvando...';
 
-                // Aggiorna la visualizzazione della classifica
-                this.displayLeaderboard();
+                // Salva il punteggio sul server
+                const success = await this.saveLeaderboard(playerName, this.score, this.level);
+                
+                if (success) {
+                    this.scoreSaved = true;
+                    this.saveScoreButton.textContent = 'Punteggio Salvato!';
+                    this.nameInputSection.style.opacity = '0.5';
+                    
+                    // Aggiorna la visualizzazione della classifica
+                    this.displayLeaderboard();
+                } else {
+                    // Riabilita il bottone in caso di errore
+                    this.saveScoreButton.disabled = false;
+                    this.saveScoreButton.textContent = 'Salva Punteggio';
+                }
             }
-
             displayLeaderboard() {
                 this.leaderboardList.innerHTML = '';
 
